@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int          @id @default(autoincrement())
+  firstname      String       @db.VarChar(255)
+  lastname       String       @db.VarChar(255)
+  email          String?      @unique
+  phone          String       @unique
+  password       String       @db.VarChar(255)
+  address        String       @db.VarChar(255)
+  role           Role         @default(USER)
+  garant         Garant       @relation(fields: [garantId], references: [id])
+  subscriptions  Subscription @relation(fields: [subscriptionId], references: [id])
+  credits        Credit       @relation(fields: [creditId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now())
+  garantId       Int
+  subscriptionId Int
+  creditId       Int
+  Penalty        Penalty[]
+}
+
+model Garant {
+  id        Int      @id @default(autoincrement())
+  firstname String   @db.VarChar(255)
+  lastname  String   @db.VarChar(255)
+  email     String?  @unique
+  phone     String   @unique
+  address   String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime?
+  User      User[]
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  amount    Int
+  total     Int
+  hour      DateTime @default(now())
+  penalty   Penalty?
+  phone     String   @unique
+  address   String   @db.VarChar(255)
+  credit    Credit   @relation(fields: [creditId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  User      User[]
+  creditId  Int
+}
+
+model Credit {
+  id           Int            @id @default(autoincrement())
+  new          String         @db.VarChar(255)
+  total        String         @db.VarChar(255)
+  hour         DateTime       @default(now())
+  subscription String?        @unique
+  updatedAt    DateTime       @default(now())
+  User         User[]
+  Subscription Subscription[]
+}
+
+model Loan {
+  id        Int      @id @default(autoincrement())
+  amount    Int
+  date      DateTime @default(now())
+  sold      Int
+  updatedAt DateTime @default(now())
+  Refund    Refund[]
+}
+
+model Refund {
+  id           Int       @id @default(autoincrement())
+  loan         Loan      @relation(fields: [loanId], references: [id])
+  amount       Int
+  scheduledFor DateTime
+  paid         Boolean   @default(false)
+  paidAt       DateTime?
+  penalty      Penalty?
+  updatedAt    DateTime  @default(now())
+  loanId       Int
+  penaltyId    Int?
+}
+
+model Penalty {
+  id             Int           @id @default(autoincrement())
+  user           User?         @relation(fields: [userId], references: [id])
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  refund         Refund?       @relation(fields: [refundId], references: [id])
+  amount         Int
+  paidAt         DateTime?
+  createdAt      DateTime      @default(now())
+  userId         Int?
+  subscriptionId Int?          @unique
+  refundId       Int?          @unique
+}
+
+model Setting {
+  id                  Int      @id @default(autoincrement())
+  actionAmount        Int
+  subscriptionPenalty Int
+  loanPenalty         Int
+  paymentDate         Int
+  limitHour           DateTime
+  deposit             Int
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  USER
+}
