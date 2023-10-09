@@ -11,33 +11,31 @@ datasource db {
 }
 
 model User {
-  id             Int          @id @default(autoincrement())
-  firstname      String       @db.VarChar(255)
-  lastname       String       @db.VarChar(255)
-  email          String?      @unique
-  phone          String       @unique
-  password       String       @db.VarChar(255)
-  address        String       @db.VarChar(255)
-  role           Role         @default(USER)
-  garant         Garant       @relation(fields: [garantId], references: [id])
-  subscriptions  Subscription @relation(fields: [subscriptionId], references: [id])
-  credits        Credit       @relation(fields: [creditId], references: [id])
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @default(now())
-  garantId       Int
-  subscriptionId Int
-  creditId       Int
-  Penalty        Penalty[]
+  id           Int            @id @default(autoincrement())
+  firstname    String         @db.VarChar(255)
+  lastname     String         @db.VarChar(255)
+  email        String?        @unique
+  phone        String         @unique
+  password     String         @db.VarChar(255)
+  address      String         @db.VarChar(255)
+  role         Role           @default(USER)
+  garant       Garant         @relation(fields: [garantId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now())
+  garantId     Int
+  Penalty      Penalty[]
+  Subscription Subscription[]
+  Credit       Credit[]
 }
 
 model Garant {
-  id        Int      @id @default(autoincrement())
-  firstname String   @db.VarChar(255)
-  lastname  String   @db.VarChar(255)
-  email     String?  @unique
-  phone     String   @unique
-  address   String   @db.VarChar(255)
-  createdAt DateTime @default(now())
+  id        Int       @id @default(autoincrement())
+  firstname String    @db.VarChar(255)
+  lastname  String    @db.VarChar(255)
+  email     String?   @unique
+  phone     String    @unique
+  address   String    @db.VarChar(255)
+  createdAt DateTime  @default(now())
   updatedAt DateTime?
   User      User[]
 }
@@ -48,24 +46,23 @@ model Subscription {
   total     Int
   hour      DateTime @default(now())
   penalty   Penalty?
-  phone     String   @unique
-  address   String   @db.VarChar(255)
   credit    Credit   @relation(fields: [creditId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-  User      User[]
-  creditId  Int
+  creditId  Int      @unique
+  userId    Int
 }
 
 model Credit {
-  id           Int            @id @default(autoincrement())
-  new          String         @db.VarChar(255)
-  total        String         @db.VarChar(255)
-  hour         DateTime       @default(now())
-  subscription String?        @unique
-  updatedAt    DateTime       @default(now())
-  User         User[]
-  Subscription Subscription[]
+  id           Int           @id @default(autoincrement())
+  new          String        @db.VarChar(255)
+  total        String        @db.VarChar(255)
+  hour         DateTime      @default(now())
+  subscription Subscription?
+  updatedAt    DateTime      @default(now())
+  User         User          @relation(fields: [userId], references: [id])
+  userId       Int
 }
 
 model Loan {

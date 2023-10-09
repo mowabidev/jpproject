@@ -12,17 +12,17 @@ const getAllMembers = async (req, res) => {
 }
 
 const newUser = async (req, res) => {
-  console.log(req.body);
-  res.status(200).json(req.body)
+  /* console.log(req.body);
+  res.status(200).json(req.body) */
 
-  /* try {
+  try {
     const users = await prisma.user.create({
-      data: req.body
+      data: { ...req.body }
     });
     res.status(200).json({users});
   } catch (error) {
     res.status(500).json({error: error.message})
-  } */
+  }
 }
 
 module.exports = { getAllMembers, newUser };
