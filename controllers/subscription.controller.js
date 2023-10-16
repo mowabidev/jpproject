@@ -22,12 +22,17 @@ const getSubscriptionById = async (req, res) => {
 }
 
 const newSubscription = async (req, res) => {
-    const getLastTotal = async () => {
-      const mount = await prisma.subscription.findFirst({
-        orderBy: { id: 'desc' }
-      });
+  const getLastTotal = async () => {
+    const mount = await prisma.subscription.findFirst({
+      orderBy: { id: 'desc' }
+    });
+  
+    if (mount && mount.total !== null) {
       return mount.total;
     }
+  
+    return 0;
+  }  
   
     try {
       const lastTotal = await getLastTotal(); // Attendre que la promesse soit résolue
@@ -50,8 +55,8 @@ const newSubscription = async (req, res) => {
 
 const editSubscription = async (req, res) => {
     const getLastTotal = async () => {
-      const mount = await prisma.subscription.findFirst({
-        orderBy: { id: 'desc' }
+      const mount = await prisma.subscription.findUnique({
+        where: {id: parseInt(req.params.id, 10)}
       });
       return mount.total - mount.amount;
     }
@@ -59,7 +64,7 @@ const editSubscription = async (req, res) => {
     try {
       const lastTotal = await getLastTotal(); // Attendre que la promesse soit résolue
       const total = parseInt(req.body.amount) + lastTotal; // Correction de la syntaxe
-  
+      
       const Subscription = await prisma.subscription.update({
         where: {id: parseInt(req.params.id, 10)},
         data: {
