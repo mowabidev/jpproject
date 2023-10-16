@@ -16,9 +16,6 @@ server.use(cors({
   origin: "*"
 }));
 
-// middleware permettant de récupérer les données envoyées sous forme de json
-server.use(express.json());
-
 server.use(cors());
 server.use(express.json());
 server.use(express.static(path.join(__dirname, 'public')));
