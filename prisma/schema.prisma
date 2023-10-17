@@ -46,11 +46,11 @@ model Subscription {
   total     Int
   hour      DateTime @default(now())
   penalty   Penalty?
-  credit    Credit   @relation(fields: [creditId], references: [id])
+  credit    Credit?   @relation(fields: [creditId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-  creditId  Int      @unique
+  creditId  Int?      @unique
   userId    Int
 }
 
@@ -68,10 +68,11 @@ model Credit {
 model Loan {
   id        Int      @id @default(autoincrement())
   amount    Int
+  refund    Int
   date      DateTime @default(now())
   sold      Int
   updatedAt DateTime @default(now())
-  Refund    Refund[]
+  refundDate    Refund[]
 }
 
 model Refund {

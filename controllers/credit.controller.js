@@ -25,7 +25,12 @@ const newCredit = async (req, res) => {
       const number = await prisma.credit.findFirst({
         orderBy: { id: 'desc' }
       });
-      return number.total;
+  
+      if (number && number.total !== null) {
+        return number.total;
+      }
+    
+      return 0;
     }
   
     try {
@@ -56,7 +61,6 @@ const editCredit = async (req, res) => {
   
     try {
       const lastTotal = await getLastTotal(); // Attendre que la promesse soit résolue
-        console.log(lastTotal);
       const total = (parseInt(req.body.new) + parseInt(lastTotal)).toString(); // Correction de la syntaxe
         
       const Credit = await prisma.credit.update({
