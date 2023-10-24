@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
-const router = require('./routes/routes.js');
+const router = require('../routes/routes.js');
 
 const port = 5000;
 
