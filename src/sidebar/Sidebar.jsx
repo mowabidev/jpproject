@@ -12,7 +12,7 @@ const Sidebar = () => {
             <li class="active">
                 <a href="#">
                     <i class='bx bxs-dashboard' ></i>
-                    <span class="text">Dashboard</span>
+                    <span class="text">Tableau de bord</span>
                 </a>
             </li>
             <li>
@@ -38,13 +38,13 @@ const Sidebar = () => {
 			<li>
 				<a href="#">
 					<i class='bx bxs-cog' ></i>
-					<span class="text">Settings</span>
+					<span class="text">Paramètre</span>
 				</a>
 			</li>
 			<li>
 				<a href="#" class="logout">
 					<i class='bx bxs-log-out-circle' ></i>
-					<span class="text">Logout</span>
+					<span class="text">Déconnexion</span>
 				</a>
 			</li>
 		</ul>
