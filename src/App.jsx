@@ -1,16 +1,19 @@
 import { useState } from 'react'
 import './App.css'
-import Sidebar from './sidebar/Sidebar'
-import Navbar from './navbar/Navbar'
-import Dashbord from './content/Dashbord'
+import { Box, Flex } from '@chakra-ui/react'
+import Sidebar from './layout/Sidebar'
+import Router from './Router'
 
 function App() {
 
   return (
     <>
-      <Sidebar />
-      <Navbar />
-      <Dashbord />
+      <Flex>
+        <Sidebar />
+        <Box padding={"4rem 1em 2em"} flexGrow={1}>
+        <Router />
+        </Box>
+      </Flex>
     </>
   )
 }

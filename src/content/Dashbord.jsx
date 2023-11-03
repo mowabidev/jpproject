@@ -5,6 +5,7 @@ import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButto
 
 const Dashbord = () => {
     const [user, setUser] = useState([]);
+    const [userId, setUserId] = useState();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     useEffect(() => {
@@ -44,15 +45,14 @@ const Dashbord = () => {
                             <td>{item.firstname}</td>
                             <td>{item.lastname}</td>
                             <td>
-                                <span className="status completed" onClick={onOpen}>Completed</span>
+                                <span className="status completed" onClick={onOpen}>Recap</span>
                             </td>
                         </tr>
-                    ))};
+                    ))}
                 </tbody>
             </table>
             </div>
         </div>
-
         
         <Modal isCentered onClose={onClose} isOpen={isOpen} motionPreset='slideInBottom'>
             <ModalOverlay />
