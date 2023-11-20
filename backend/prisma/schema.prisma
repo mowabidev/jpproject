@@ -16,10 +16,10 @@ model User {
   lastname     String         @db.VarChar(255)
   email        String?        @unique
   phone        String         @unique
-  password     String         @db.VarChar(255)
+  password     String?         @db.VarChar(255)
   address      String         @db.VarChar(255)
   role         Role           @default(USER)
-  garant       Garant         @relation(fields: [garantId], references: [id])
+  garant       Garant?        @relation(fields: [garantId], references: [id])
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @default(now())
   garantId     Int
@@ -48,7 +48,7 @@ model Subscription {
   penalty   Penalty?
   credit    Credit?   @relation(fields: [creditId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
-  scheduledFor DateTime
+  scheduledFor DateTime?
   paid         Boolean   @default(false)
   paidAt       DateTime?
   createdAt DateTime @default(now())

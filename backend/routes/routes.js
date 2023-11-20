@@ -7,7 +7,7 @@ const penalityRoutes = require('./penality.routes.js');
 const settingRoutes = require('./setting.routes.js');
 
 const router = (server) => {
-  server.use('/user', userRoutes);
+  server.use('/users', userRoutes);
   server.use('/garant', garantRoutes);
   server.use('/subscription', subscriptionRoutes);
   server.use('/credit', creditRoutes);

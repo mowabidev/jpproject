@@ -22,7 +22,7 @@ const getSubscriptionById = async (req, res) => {
 }
 
 const newSubscription = async (req, res) => {
-  const getLastTotal = async () => {
+  /*const getLastTotal = async () => {
     const mount = await prisma.subscription.findFirst({
       orderBy: { id: 'desc' }
     });
@@ -32,16 +32,15 @@ const newSubscription = async (req, res) => {
     }
   
     return 0;
-  }  
+  }  */
   
     try {
-      const lastTotal = await getLastTotal(); // Attendre que la promesse soit résolue
-      const total = parseInt(req.body.amount) + lastTotal; // Correction de la syntaxe
+      //const lastTotal = await getLastTotal(); // Attendre que la promesse soit résolue
+      //const total = parseInt(req.body.amount) + lastTotal; // Correction de la syntaxe
   
       const Subscription = await prisma.subscription.create({
         data: {
           ...req.body,
-          total,
           createdAt: new Date()
         }
       });

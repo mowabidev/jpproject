@@ -4,12 +4,17 @@ const prisma = new PrismaClient;
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await prisma.user.findMany();
-    res.status(200).json({users});
+    const users = await prisma.user.findMany({
+      orderBy: {
+        id: 'desc', 
+      },
+    });
+    res.status(200).json({ users });
   } catch (error) {
-    res.status(500).json({error: error.message})
+    res.status(500).json({ error: 'Une erreur s\'est produite lors de la récupération des utilisateurs.' });
   }
-}
+};
+
 
 const getUserById = async (req, res) => {
     try {
@@ -20,16 +25,38 @@ const getUserById = async (req, res) => {
   }
 }
 
+const getUserByEmail = async (req, res) => {
+  try {
+  const user = await prisma.user.findUnique({where: {email: req.params.email}});
+  res.status(200).json(user);
+} catch (error) {
+  res.status(500).json({error: error.message})
+}
+}
+
+const getUserByPhone = async (req, res) => {
+  try {
+  const user = await prisma.user.findUnique({where: {phone: req.params.phone}});
+  res.status(200).json(user);
+} catch (error) {
+  res.status(500).json({error: error.message})
+}
+}
+
 const newUser = async (req, res) => {
   try {
-    const users = await prisma.user.create({
-      data: { ...req.body }
+    const { garantId, ...userData } = req.body;
+    console.log(garantId, userData);
+
+    const user = await prisma.user.create({
+      data: { garantId: parseInt(garantId, 10), password: "1234", ...userData }
     });
-    res.status(200).json({users});
+
+    res.status(200).json({user});
   } catch (error) {
-    res.status(500).json({error: error.message})
+    res.status(500).json({ error: error.message });
   }
-}
+};
 
 const edithUser = async (req, res) => {
   
@@ -54,4 +81,4 @@ const deleteUser = async (req, res) => {
 }
 
 
-module.exports = { getAllUsers, getUserById, newUser, edithUser, deleteUser };
+module.exports = { getAllUsers, getUserById, newUser, edithUser, deleteUser, getUserByEmail, getUserByPhone };

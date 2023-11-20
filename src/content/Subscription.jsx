@@ -1,4 +1,4 @@
-import { Heading, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Avatar, HStack, Button, Checkbox, Flex, Input, Divider, Box, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, FormControl, FormLabel, Select, useDisclosure } from '@chakra-ui/react'
+import { Heading, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Avatar, HStack, Button, Checkbox, Flex, Input, Divider, Box, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, FormControl, FormLabel, Select, useDisclosure, VStack } from '@chakra-ui/react'
 import React from 'react'
 import { MdDelete, MdRemoveRedEye, MdMode, MdFileDownload, MdPersonAdd, MdSearch } from 'react-icons/md'
 
@@ -15,21 +15,8 @@ const Subscription = () => {
         <TableContainer>
             <Flex justifyContent={"space-between"} >
                 <HStack>
-                    <Button leftIcon={<MdDelete />} flexShrink={0}>
-                        Supprimer
-                    </Button>
-                    <HStack>
-                        <Input placeholder='Rechercher' pr={"3em"}/>
+                        <Input placeholder='Rechercher'/>
                         <Box ml={"-2.5em"}><MdSearch /></Box>
-                    </HStack>
-                </HStack>
-                <HStack>
-                    <Button leftIcon={<MdFileDownload />} flexShrink={0}>
-                        Importer
-                    </Button>
-                    <Button onClick={onOpen} leftIcon={<MdPersonAdd />} flexShrink={0}>
-                        Nouveau
-                    </Button>
                 </HStack>
             </Flex>
             <Divider  borderColor={"#d1d1d1"} m={".5rem 0 1rem"} />
@@ -53,14 +40,8 @@ const Subscription = () => {
                       <Td>30/10/2023 - 12:00</Td>
                       <Td>
                           <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
+                              <Button onClick={onOpen} size={"xs"} colorScheme='yellow' variant='solid'>
                                   <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
                               </Button>
                           </HStack>
                       </Td>
@@ -73,14 +54,8 @@ const Subscription = () => {
                       <Td>30/10/2023 - 12:00</Td>
                       <Td>
                           <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
+                              <Button onClick={onOpen} size={"xs"} colorScheme='yellow' variant='solid'>
                                   <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
                               </Button>
                           </HStack>
                       </Td>
@@ -93,14 +68,8 @@ const Subscription = () => {
                       <Td>30/10/2023 - 12:00</Td>
                       <Td>
                           <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
+                              <Button onClick={onOpen} size={"xs"} colorScheme='yellow' variant='solid'>
                                   <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
                               </Button>
                           </HStack>
                       </Td>
@@ -113,14 +82,8 @@ const Subscription = () => {
                       <Td>30/10/2023 - 12:00</Td>
                       <Td>
                           <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
+                              <Button onClick={onOpen} size={"xs"} colorScheme='yellow' variant='solid'>
                                   <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
                               </Button>
                           </HStack>
                       </Td>
@@ -133,14 +96,8 @@ const Subscription = () => {
                       <Td>30/10/2023 - 12:00</Td>
                       <Td>
                           <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
+                              <Button onClick={onOpen} size={"xs"} colorScheme='yellow' variant='solid'>
                                   <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
                               </Button>
                           </HStack>
                       </Td>
@@ -153,14 +110,8 @@ const Subscription = () => {
                       <Td>30/10/2023 - 12:00</Td>
                       <Td>
                           <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
+                              <Button onClick={onOpen} size={"xs"} colorScheme='yellow' variant='solid'>
                                   <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
                               </Button>
                           </HStack>
                       </Td>
@@ -173,14 +124,8 @@ const Subscription = () => {
                       <Td>30/10/2023 - 12:00</Td>
                       <Td>
                           <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
+                              <Button onClick={onOpen} size={"xs"} colorScheme='yellow' variant='solid'>
                                   <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
                               </Button>
                           </HStack>
                       </Td>
@@ -188,7 +133,7 @@ const Subscription = () => {
                 </Tbody>
             </Table>
         </TableContainer>
-        <Modal size={'xl'}
+        <Modal size={'xs'}
         initialFocusRef={initialRef}
         finalFocusRef={finalRef}
         isOpen={isOpen}
@@ -198,21 +143,12 @@ const Subscription = () => {
           <ModalHeader>Nouvelle souscription</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <HStack mb={6}>
-              <FormControl>
-                <FormLabel>Membre</FormLabel>
-                <Select>
-                  <option value='option1'>Option 1</option>
-                  <option value='option2'>Option 2</option>
-                  <option value='option3'>Option 3</option>
-                </Select>
+            <VStack mb={6}><FormControl>
+                <FormLabel>Nombre de part</FormLabel>
+                <Input placeholder='4' />
               </FormControl>
-
-              <FormControl>
-                <FormLabel>Montant</FormLabel>
-                <Input placeholder='10000' />
-              </FormControl>
-            </HStack>
+              <Checkbox defaultChecked>Payé</Checkbox>
+            </VStack>
           </ModalBody>
 
           <ModalFooter>

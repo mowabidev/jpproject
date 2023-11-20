@@ -1,4 +1,4 @@
-import { Heading, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Avatar, HStack, Button, Checkbox, Flex, Input, Divider, Box, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, FormControl, FormLabel, Select, useDisclosure } from '@chakra-ui/react'
+import { Heading, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Avatar, HStack, Button, Checkbox, Flex, Input, Divider, Box, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, FormControl, FormLabel, Select, useDisclosure, VStack } from '@chakra-ui/react'
 import React from 'react'
 import { MdDelete, MdRemoveRedEye, MdMode, MdFileDownload, MdPersonAdd, MdSearch } from 'react-icons/md'
 
@@ -196,17 +196,17 @@ const Loan = () => {
                 </Tbody>
             </Table>
         </TableContainer>
-        <Modal size={'xl'}
+        <Modal size={'xs'}
         initialFocusRef={initialRef}
         finalFocusRef={finalRef}
         isOpen={isOpen}
         onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Nouvelle souscription</ModalHeader>
+          <ModalHeader>Nouveau prêt</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <HStack mb={6}>
+            <VStack mb={6}>
                 <FormControl>
                     <FormLabel>Membre</FormLabel>
                     <Select>
@@ -225,7 +225,7 @@ const Loan = () => {
                     <FormLabel>Nombre de remboursement</FormLabel>
                     <Input placeholder='4' />
                 </FormControl>
-            </HStack>
+            </VStack>
           </ModalBody>
 
           <ModalFooter>
