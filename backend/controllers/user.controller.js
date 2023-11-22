@@ -72,13 +72,22 @@ const edithUser = async (req, res) => {
 }
 
 const deleteUser = async (req, res) => {
-    try {
-    const user = await prisma.user.delete({where: {id: parseInt(req.params.id, 10)}});
-    res.status(200).json("L'utilisateur ayant l'id "+ req.params.id + " à été supprimé");
+  try {
+
+      // Supprimer les références dans d'autres tables en premier
+      await prisma.subscription.deleteMany({where: {userId: parseInt(req.params.id, 10),},
+      });
+
+      // Ensuite, supprimer l'utilisateur
+      const user = await prisma.user.delete({where: { id: parseInt(req.params.id, 10) },
+      });
+      res.status(200).json("L'utilisateur ayant l'id "+ req.params.id + " à été supprimé");
   } catch (error) {
-    res.status(500).json({error: error.message})
+      console.error(error);
+      res.status(500).json({ error: 'Erreur lors de la suppression de l\'utilisateur.' });
   }
-}
+};
+
 
 
 module.exports = { getAllUsers, getUserById, newUser, edithUser, deleteUser, getUserByEmail, getUserByPhone };

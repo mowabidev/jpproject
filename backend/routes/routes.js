@@ -8,12 +8,12 @@ const settingRoutes = require('./setting.routes.js');
 
 const router = (server) => {
   server.use('/users', userRoutes);
-  server.use('/garant', garantRoutes);
-  server.use('/subscription', subscriptionRoutes);
-  server.use('/credit', creditRoutes);
-  server.use('/loan', loanRoutes);
-  server.use('/penality', penalityRoutes);
-  server.use('/setting', settingRoutes);
+  server.use('/garants', garantRoutes);
+  server.use('/subscriptions', subscriptionRoutes);
+  server.use('/credits', creditRoutes);
+  server.use('/loans', loanRoutes);
+  server.use('/penalies', penalityRoutes);
+  server.use('/settings', settingRoutes);
 }
 
 module.exports = router

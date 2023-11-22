@@ -31,28 +31,30 @@ const Users = () => {
   const { isOpen: isOpenRemove, onOpen:onOpenRemove, onClose: onCloseRemove } = useDisclosure();
 
 
-  const saveSubscription = (subId) => {
+  const saveSubscription = async (userId) => {
     const amount = 0;
     const total = 0;
-    fetch('http://localhost:5000/subscription/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        amount,
-        total,
-        userId: subId,
-        createdAt: new Date(),
-      }),
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
+    try {
+      const response = await fetch('http://localhost:5000/subscriptions/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount, total, userId: userId, createdAt: new Date() }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}`);
       }
-      throw new Error("Erreur" + response.status);
-    })
+  
+      const data = await response.json();
+      console.log(data);
+      // Faites quelque chose avec la réponse du serveur si nécessaire
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement des données :', error);
+    }
   };
+  
   
 
 
@@ -85,6 +87,7 @@ const Users = () => {
 
   const deleteUserById = async (userId) => {
     try {
+      console.log(userId)
       const response = await fetch(`http://localhost:5000/users/${userId}`, {
         method: 'DELETE',
       });
@@ -193,7 +196,7 @@ const Users = () => {
   useEffect(() => {
     Promise.all([
       fetch('http://localhost:5000/users'),
-      fetch('http://localhost:5000/garant')
+      fetch('http://localhost:5000/garants')
     ])
     .then(async values => {
       const [usersResponse, garantsResponse] = values;
@@ -201,7 +204,7 @@ const Users = () => {
         const {users} = await values[0].json();
         const {garants} = await values[1].json();
         setGarant(garants);
-        setUsers(users);
+        setUsers(users); 
       } else if(!garantsResponse.ok) {
         throw new Error(`Le serveur des garants a répondu avec une erreur ${garantsResponse.status}`)
       } else {

@@ -4,8 +4,8 @@ const prisma = new PrismaClient;
 
 const getAllSubscriptions = async (req, res) => {
   try {
-    const Subscriptions = await prisma.subscription.findMany();
-    res.status(200).json({Subscriptions});
+    const subscriptions = await prisma.subscription.findMany();
+    res.status(200).json({subscriptions});
   } catch (error) {
     res.status(500).json({error: error.message})
   }
@@ -14,8 +14,8 @@ const getAllSubscriptions = async (req, res) => {
 const getSubscriptionById = async (req, res) => {
     console.log(req.params.id);
     try {
-    const Subscription = await prisma.subscription.findUnique({where: {id: parseInt(req.params.id, 10)}});
-    res.status(200).json({Subscription});
+    const subscription = await prisma.subscription.findUnique({where: {id: parseInt(req.params.id, 10)}});
+    res.status(200).json({subscription});
   } catch (error) {
     res.status(500).json({error: error.message})
   }
