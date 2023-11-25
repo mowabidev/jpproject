@@ -4,18 +4,30 @@ const prisma = new PrismaClient;
 
 const getAllSubscriptions = async (req, res) => {
   try {
-    const subscriptions = await prisma.subscription.findMany();
-    res.status(200).json({subscriptions});
+    const subscriptions = await prisma.subscription.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstname: true,
+            lastname: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({ subscriptions });
   } catch (error) {
-    res.status(500).json({error: error.message})
+    res.status(500).json({ error: error.message });
   }
-}
+};
+
 
 const getSubscriptionById = async (req, res) => {
     console.log(req.params.id);
     try {
-    const subscription = await prisma.subscription.findUnique({where: {id: parseInt(req.params.id, 10)}});
-    res.status(200).json({subscription});
+    const Subscription = await prisma.subscription.findUnique({where: {id: parseInt(req.params.id, 10)}});
+    res.status(200).json({Subscription});
   } catch (error) {
     res.status(500).json({error: error.message})
   }
@@ -38,14 +50,14 @@ const newSubscription = async (req, res) => {
       //const lastTotal = await getLastTotal(); // Attendre que la promesse soit résolue
       //const total = parseInt(req.body.amount) + lastTotal; // Correction de la syntaxe
   
-      const Subscription = await prisma.subscription.create({
+      const subscription = await prisma.subscription.create({
         data: {
           ...req.body,
           createdAt: new Date()
         }
       });
   
-      res.status(200).json({ Subscription });
+      res.status(200).json({ subscription });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -54,11 +66,16 @@ const newSubscription = async (req, res) => {
 
 const editSubscription = async (req, res) => {
     const getLastTotal = async () => {
-      const mount = await prisma.subscription.findUnique({
-        where: {id: parseInt(req.params.id, 10)}
+      const mount = await prisma.subscription.findFirst({
+        orderBy: { updatedAt: 'desc' }
       });
-      return mount.total - mount.amount;
-    }
+    
+      if (mount && mount.total !== null) {
+        return mount.total;
+      }
+    
+      return 0;
+    }  
   
     try {
       const lastTotal = await getLastTotal(); // Attendre que la promesse soit résolue

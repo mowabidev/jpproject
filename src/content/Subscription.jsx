@@ -49,11 +49,11 @@ const Subscription = () => {
 
   }, []);
 
-  const fetchSubscriptionDetailsById = (SubscriptionId) => {
-    fetch(`http://localhost:5000/subscriptions/${SubscriptionId}`)
+  const fetchSubscriptionDetailsById = (subscriptionId) => {
+    fetch(`http://localhost:5000/subscriptions/${subscriptionId}`)
       .then(response => response.json())
       .then(data => {
-        setSubscriptionId(data.subscription.id);
+        setSubscriptionId(data.Subscription.id);
       })
       .then(() => {
         onOpen();
@@ -64,8 +64,7 @@ const Subscription = () => {
   const savePayement = () => {
     const amount  = getValues().nb_part * 2000
     fetch(`http://localhost:5000/subscriptions/${subscriptionId}`, {
-      method: 'PACTH',
-      mode: 'cors',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -81,11 +80,18 @@ const Subscription = () => {
       throw new Error("Erreur" + response.status)
     })
     .then(data => {
-      setSubscriptions(prevSubscription => [data.subscriptions.subscription, ...prevSubscription]);
+      setSubscriptions(prevSubscriptions => 
+        prevSubscriptions.map(sub => 
+          sub.id === subscriptionId
+            ? { ...sub, amount: data.Subscription.amount, updatedAt: data.Subscription.updatedAt }
+            : sub
+        )
+      );
+      
     })
     .catch(error => {
       console.error('Erreur lors de l\'enregistrement des données :', error);
-    });
+    })
     reset();
     onClose();
   };
@@ -116,20 +122,21 @@ const Subscription = () => {
                 </Tr>
                 </Thead>
                 <Tbody>
-                    {
+                    { 
                     subscriptions.length > 0 ? subscriptions.map((item, index) => (
                     <Tr key={index}>
                         <Td>
                             <Checkbox spacing="1rem" bg="#fff"></Checkbox>
                         </Td>
-                        <Td>{item.id}</Td>
+                        <Td>{item.user.id}</Td>
                         <Td>
                             <HStack>
-                                <Avatar name={`${item.firstname} ${item.lastname}`} size="sm" src="" />{' '}
-                                <span>{item.firstname} {item.lastname}</span>
+                                <Avatar name={`${item.user.firstname} ${item.user.lastname}`} size="sm" src="" />{' '}
+                                <span>{item.user.firstname} {item.user.lastname}</span>
                             </HStack>
                         </Td>
                         <Td>{item.amount}</Td>
+                        <Td>{item.updatedAt}</Td>
                         <Td>
                           <HStack>
                               <Button size={"xs"} colorScheme='yellow' variant='solid' onClick={() => fetchSubscriptionDetailsById(item.id)}>
