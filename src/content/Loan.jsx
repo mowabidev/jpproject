@@ -1,13 +1,72 @@
 import { Heading, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Avatar, HStack, Button, Checkbox, Flex, Input, Divider, Box, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, FormControl, FormLabel, Select, useDisclosure, VStack } from '@chakra-ui/react'
-import React from 'react'
-import { MdDelete, MdRemoveRedEye, MdMode, MdFileDownload, MdPersonAdd, MdSearch } from 'react-icons/md'
+import React, { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { MdDelete, MdFileDownload, MdPersonAdd, MdSearch } from 'react-icons/md'
 
-const Loan = () => {
+const Loan = () => {  
+    const {
+    handleSubmit,
+    register,
+    getValues,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+        userId:'',
+        amount:'',
+        nb_ref: ''
+    },
+    mode: 'onBlur'
+  })
   
   const { isOpen, onOpen, onClose } = useDisclosure()
-
+  
+  const [users, setUsers] = useState([])
   const initialRef = React.useRef(null)
   const finalRef = React.useRef(null)
+
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/users`)
+      .then(response => response.json())
+      .then(data => setUsers(data.users)) 
+      .catch(error => console.error('Erreur lors de la récupération des données :', error)); 
+  });
+
+  const saveLoan = () => {
+    const amount  = getValues().nb_part * 2000
+    fetch(`http://localhost:5000/subscriptions/${subscriptionId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount,
+        updatedAt: new Date(),
+      }),
+    })
+    .then(response => {
+      if(response.ok) {
+        return response.json()
+      }
+      throw new Error("Erreur" + response.status)
+    })
+    .then(data => {
+      setSubscriptions(prevSubscriptions => 
+        prevSubscriptions.map(sub => 
+          sub.id === subscriptionId
+            ? { ...sub, amount: data.Subscription.amount, updatedAt: data.Subscription.updatedAt }
+            : sub
+        )
+      );
+      
+    })
+    .catch(error => {
+      console.error('Erreur lors de l\'enregistrement des données :', error);
+    })
+    reset();
+    onClose();
+  };
 
   return (
     <div>
@@ -45,155 +104,6 @@ const Loan = () => {
                     <Th>Action</Th>
                 </Tr>
                 </Thead>
-                <Tbody>
-                  <Tr>
-                      <Td><Checkbox spacing='1rem' bg={"#fff"}></Checkbox></Td>
-                      <Td>T23MPPY</Td>
-                      <Td><HStack><Avatar name='Dan Abrahmov' size='sm' src='https://bit.ly/dan-abramov' /> <span>Dan Abrahmov</span></HStack></Td>
-                      <Td>10.000 XOF</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>
-                          <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
-                                  <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
-                              </Button>
-                          </HStack>
-                      </Td>
-                  </Tr>
-                  <Tr>
-                      <Td><Checkbox spacing='1rem' bg={"#fff"}></Checkbox></Td>
-                      <Td>T23MPPY</Td>
-                      <Td><HStack><Avatar name='Dan Abrahmov' size='sm' src='https://bit.ly/dan-abramov' /> <span>Dan Abrahmov</span></HStack></Td>
-                      <Td>10.000 XOF</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>
-                          <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
-                                  <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
-                              </Button>
-                          </HStack>
-                      </Td>
-                  </Tr>
-                  <Tr>
-                      <Td><Checkbox spacing='1rem' bg={"#fff"}></Checkbox></Td>
-                      <Td>T23MPPY</Td>
-                      <Td><HStack><Avatar name='Dan Abrahmov' size='sm' src='https://bit.ly/dan-abramov' /> <span>Dan Abrahmov</span></HStack></Td>
-                      <Td>10.000 XOF</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>
-                          <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
-                                  <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
-                              </Button>
-                          </HStack>
-                      </Td>
-                  </Tr>
-                  <Tr>
-                      <Td><Checkbox spacing='1rem' bg={"#fff"}></Checkbox></Td>
-                      <Td>T23MPPY</Td>
-                      <Td><HStack><Avatar name='Dan Abrahmov' size='sm' src='https://bit.ly/dan-abramov' /> <span>Dan Abrahmov</span></HStack></Td>
-                      <Td>10.000 XOF</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>
-                          <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
-                                  <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
-                              </Button>
-                          </HStack>
-                      </Td>
-                  </Tr>
-                  <Tr>
-                      <Td><Checkbox spacing='1rem' bg={"#fff"}></Checkbox></Td>
-                      <Td>T23MPPY</Td>
-                      <Td><HStack><Avatar name='Dan Abrahmov' size='sm' src='https://bit.ly/dan-abramov' /> <span>Dan Abrahmov</span></HStack></Td>
-                      <Td>10.000 XOF</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>
-                          <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
-                                  <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
-                              </Button>
-                          </HStack>
-                      </Td>
-                  </Tr>
-                  <Tr>
-                      <Td><Checkbox spacing='1rem' bg={"#fff"}></Checkbox></Td>
-                      <Td>T23MPPY</Td>
-                      <Td><HStack><Avatar name='Dan Abrahmov' size='sm' src='https://bit.ly/dan-abramov' /> <span>Dan Abrahmov</span></HStack></Td>
-                      <Td>10.000 XOF</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>
-                          <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
-                                  <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
-                              </Button>
-                          </HStack>
-                      </Td>
-                  </Tr>
-                  <Tr>
-                      <Td><Checkbox spacing='1rem' bg={"#fff"}></Checkbox></Td>
-                      <Td>T23MPPY</Td>
-                      <Td><HStack><Avatar name='Dan Abrahmov' size='sm' src='https://bit.ly/dan-abramov' /> <span>Dan Abrahmov</span></HStack></Td>
-                      <Td>10.000 XOF</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>30/10/2023 - 12:00</Td>
-                      <Td>
-                          <HStack>
-                              <Button size={"xs"} colorScheme='teal' variant='solid'>
-                                  <MdRemoveRedEye />
-                              </Button>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid'>
-                                  <MdMode />
-                              </Button>
-                              <Button size={"xs"} colorScheme='red' variant='solid'>
-                                  <MdDelete />
-                              </Button>
-                          </HStack>
-                      </Td>
-                  </Tr>
-                </Tbody>
             </Table>
         </TableContainer>
         <Modal size={'xs'}
@@ -207,33 +117,62 @@ const Loan = () => {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <VStack mb={6}>
-                <FormControl>
-                    <FormLabel>Membre</FormLabel>
-                    <Select>
-                    <option value='option1'>Option 1</option>
-                    <option value='option2'>Option 2</option>
-                    <option value='option3'>Option 3</option>
-                    </Select>
-                </FormControl>
+                <form onSubmit={handleSubmit(saveLoan)}>
+                    <FormControl isInvalid={errors.userId}>
+                        <FormLabel>Membre</FormLabel>
+                        <Select 
+                            {...register('userId', {
+                            required: 'Ce champ est obligatoire',
+                            })}>
+                            <option value="">-Choisir un membre-</option>
+                            {users && users.map((item, index) => ( 
+                                <option key={index} value={item.id}>
+                                {item.firstname} {item.lastname}
+                                </option>
+                            ))} 
+                        </Select>
+                        {errors.userId && (
+                        <FormErrorMessage>{errors.userId.message}</FormErrorMessage>
+                        )}
+                    </FormControl>
 
-                <FormControl>
-                    <FormLabel>Montant</FormLabel>
-                    <Input placeholder='10000' />
-                </FormControl>
+                    <FormControl>
+                        <FormLabel>Montant</FormLabel>
+                        <Input
+                            type="number"
+                            placeholder="10000"
+                            {...register('amount', {
+                            required: 'Ce champ est obligatoire',
+                            minLength: { value: 4, message: 'Montant minimum insuffisant' },
+                            })}
+                        />
+                        {errors.amount && (
+                          <FormErrorMessage>{errors.amount.message}</FormErrorMessage>
+                        )}
+                    </FormControl>
 
-                <FormControl>
-                    <FormLabel>Nombre de remboursement</FormLabel>
-                    <Input placeholder='4' />
-                </FormControl>
+                    <FormControl>
+                        <FormLabel>Nombre de remboursement</FormLabel>
+                        <Input
+                        type="number"
+                        placeholder="4"
+                        {...register('nb_ref', {
+                            required: 'Ce champ est obligatoire',
+                        })}
+                        />
+                        {errors.nb_ref && (
+                          <FormErrorMessage>{errors.nb_ref.message}</FormErrorMessage>
+                        )}
+                    </FormControl>
+                </form>
             </VStack>
+            <HStack justifyContent="end">
+              <Button type='submit' colorScheme="blue" mr={3}>
+                Enregistrer
+              </Button>
+              <Button onClick={onClose}>Retour</Button>
+            </HStack>
           </ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3}>
-              Enregister
-            </Button>
-            <Button onClick={onClose}>Retour</Button>
-          </ModalFooter>
         </ModalContent>
         </Modal>
     </div>

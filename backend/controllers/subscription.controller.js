@@ -20,7 +20,17 @@ const getAllSubscriptions = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}
+
+const getSubscriptionByUserId = async (req, res) => {
+  console.log(req.params.userId);
+  try {
+  const subscription = await prisma.subscription.findMany({where: {userId: parseInt(req.params.userId, 10)}});
+  res.status(200).json(subscription);
+} catch (error) {
+  res.status(500).json({error: error.message})
+}
+}
 
 
 const getSubscriptionById = async (req, res) => {
@@ -105,4 +115,4 @@ const deleteSubscription = async (req, res) => {
   }
 }
 
-module.exports = { getAllSubscriptions, getSubscriptionById, newSubscription, editSubscription, deleteSubscription };
+module.exports = { getAllSubscriptions, getSubscriptionByUserId, getSubscriptionById, newSubscription, editSubscription, deleteSubscription };

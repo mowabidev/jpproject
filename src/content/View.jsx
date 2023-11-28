@@ -6,13 +6,28 @@ import { useParams } from 'react-router-dom';
 
 const View = () => {
   const [user, setUser] = useState({});
+  const [subById, setSubById] = useState([]); 
   const { id } = useParams();
+
+  const totalAmount = subById.reduce((acc, obj) => acc + obj.amount, 0);
 
   useEffect(() => {
     fetch(`http://localhost:5000/users/${id}`)
       .then(response => response.json())
       .then(data => setUser(data.user)) 
       .catch(error => console.error('Erreur lors de la récupération des données :', error)); 
+  }, [id]);
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/subscriptions/userId/${id}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Réponse réseau incorrecte');
+        }
+        return response.json();
+      })
+      .then(data => setSubById(data))
+      .catch(error => console.error('Erreur lors de la récupération des données :', error));
   }, [id]);
 
   return (
@@ -43,7 +58,7 @@ const View = () => {
             <CardHeader>
               <Heading size="md">SOUSCRIPTIONS</Heading>
             </CardHeader>
-            <CardBody fontSize={"1.5rem"}>250 POINTS</CardBody>
+            <CardBody fontSize={"1.5rem"}>{totalAmount} XOF</CardBody>
             <CardFooter>
               <Button size="xs" colorScheme="teal" variant="solid">
                 <MdRemoveRedEye />

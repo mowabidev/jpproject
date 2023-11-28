@@ -18,9 +18,13 @@ const Subscription = () => {
     mode: 'onBlur'
   })
 
-  const [subscriptions, setSubscriptions] = useState([]); 
+  const [subscriptions, setSubscriptions] = useState([]);
   const [subscriptionId, setSubscriptionId] = useState([]);
+  const [userId, setUserId] = useState([]);
   const [settings, setSettings] = useState([]);
+  const [dateString, setDateString] = useState([]);
+  const [nb_part, setNb_part] = useState([]);
+  const [month, setMonth] = useState([]);
   
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -54,6 +58,7 @@ const Subscription = () => {
       .then(response => response.json())
       .then(data => {
         setSubscriptionId(data.Subscription.id);
+        setUserId(data.Subscription.userId);
       })
       .then(() => {
         onOpen();
@@ -61,8 +66,55 @@ const Subscription = () => {
       .catch(error => console.error('Erreur lors de la récupération des détails de l\'utilisateur :', error));
   };
 
+  function creditCalculate(mois, nombreDeParts) {
+    // Vérifier si le mois est valide (entre 1 et 12)
+    if (mois < 1 || mois > 12) {
+      console.log("Mois invalide.");
+      return 0;
+    }
+  
+    // Calculer le nombre de points en fonction du mois
+    const points = 12 - mois;
+  
+    // Attribuer des points en fonction du nombre de parts
+    const totalPoints = points * nombreDeParts;
+  
+    return totalPoints;
+  }
+  
+
+  const saveCredit = async (subscriptionId, userId) => {
+    const dateObject = new Date(dateString);
+
+    setMonth(dateObject.getMonth() + 1); 
+    
+
+    try {
+      const response = await fetch('http://localhost:5000/credits/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ new: creditCalculate(month, nb_part), userId: userId, createdAt: new Date() }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log(data);
+      // Faites quelque chose avec la réponse du serveur si nécessaire
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement des données :', error);
+    }
+  };
+
   const savePayement = () => {
-    const amount  = getValues().nb_part * 2000
+    setDateString(getValues().updatedAt);
+    setNb_part(getValues().nb_part);
+
+    const amount  = nb_part * 2000
     fetch(`http://localhost:5000/subscriptions/${subscriptionId}`, {
       method: 'PATCH',
       headers: {
@@ -70,7 +122,7 @@ const Subscription = () => {
       },
       body: JSON.stringify({
         amount,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       }),
     })
     .then(response => {
@@ -87,7 +139,7 @@ const Subscription = () => {
             : sub
         )
       );
-      
+      saveCredit(subscriptionId, userId);
     })
     .catch(error => {
       console.error('Erreur lors de l\'enregistrement des données :', error);
