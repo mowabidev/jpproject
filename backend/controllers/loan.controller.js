@@ -4,9 +4,30 @@ const prisma = new PrismaClient;
 
 const getAllLoans = async (req, res) => {
   try {
-    const Loans = await prisma.loan.findMany();
-    res.status(200).json({Loans});
+    const Loans = await prisma.loan.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstname: true,
+            lastname: true,
+          },
+        },
+      },
+    });
+    res.status(200).json(Loans);
   } catch (error) {
+    res.status(500).json({error: error.message})
+  }
+}
+
+const getLoanByUserId = async (req, res) => {
+  console.log(req.params.userId);
+  try {
+    const loan = await prisma.loan.findMany({where: {userId: parseInt(req.params.userId, 10)}});
+    res.status(200).json(loan);
+  } 
+  catch (error) {
     res.status(500).json({error: error.message})
   }
 }
@@ -34,52 +55,61 @@ const newLoan = async (req, res) => {
   }  
   
   try {
-    const lastSold = await getLastSold(); // Attendre que la promesse soit résolue
-    const sold = parseInt(req.body.amount) + lastSold; // Correction de la syntaxe
+    const lastSold = await getLastSold();
+    const sold = parseInt(req.body.amount) + lastSold;
     const amountLoan = parseInt(req.body.amount);
     const refund = parseInt(req.body.refund);
-    const startDate = new Date();
+    const currentDate = new Date();
 
-    const schedulePayments = async (amountLoan, refund, startDate) => {
-        const paymentDates = [];
-        let currentLoan = amountLoan;
-        let currentDate = new Date(startDate);
-    
-        while (currentLoan > 0) {
-            paymentDates.push(new Date(currentDate));
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            currentLoan -= refund;
-            if (currentLoan < 0) currentLoan = 0;
-        }
-    
-        return paymentDates;
-    }
-    
-    const refundDates = await schedulePayments(amountLoan, refund, startDate);
-
+    // Première requête - Création de prêt
     const Loan = await prisma.loan.create({
       data: {
         ...req.body,
-        sold,
-        date: new Date()
+        sold
       }
     });
     res.status(200).json({ Loan });
+
+    // Deuxième requête - Création des remboursements
+    const schedulePayments = async (amountLoan, refund, currentDate) => {
+      const paymentDates = [];
+      let currentLoan = amountLoan;
+      const nextMonthDate = new Date(currentDate);
+      nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+
+      while (currentLoan > 0) {            
+        paymentDates.push(new Date(nextMonthDate));
+        nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+        currentLoan -= refund;
+      }
+
+      return paymentDates;
+    }
+
+    const refundDates = await schedulePayments(amountLoan, refund, currentDate);
+
     for (const date of refundDates) {
-      await prisma.refund.create({
-        data: {
-          amount: refund,
-          scheduledFor: date,
-          updatedAt: new Date(),
-          loanId: Loan.id
-          // ... autres champs de remboursement
-        }
-      });
+      try {
+        await prisma.refund.create({
+          data: {
+            amount: refund,
+            scheduledFor: date,
+            updatedAt: new Date(),
+            loanId: Loan.id
+          }
+        });
+      } catch (refundError) {
+        // Gestion des erreurs pour la création des remboursements
+        console.error('Erreur lors de la création du remboursement :', refundError);
+        // Vous pouvez choisir de renvoyer une réponse d'erreur appropriée ici
+      }
     }
   } catch (error) {
+    // Gestion des erreurs générales
     res.status(500).json({ error: error.message });
   }
 }
+
   
 
 const editLoan = async (req, res) => {
@@ -95,18 +125,18 @@ const editLoan = async (req, res) => {
     const sold = parseInt(req.body.amount) + lastSold; // Correction de la syntaxe
     const amountLoan = parseInt(req.body.amount);
     const refund = parseInt(req.body.refund);
-    const startDate = new Date();
+    const currentDate = new Date();
 
-    const schedulePayments = async (amountLoan, refund, startDate) => {
+    const schedulePayments = async (amountLoan, refund, currentDate) => {
         const paymentDates = [];
         let currentLoan = amountLoan;
-        let currentDate = new Date(startDate);
+        const nextMonthDate = new Date(currentDate);
+        nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
     
         while (currentLoan > 0) {
-            paymentDates.push(new Date(currentDate));
-            currentDate.setMonth(currentDate.getMonth() + 1);
+            paymentDates.push(new Date(nextMonthDate));
+            nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
             currentLoan -= refund;
-            if (currentLoan < 0) currentLoan = 0;
         }
     
         return paymentDates;
@@ -137,7 +167,7 @@ const editLoan = async (req, res) => {
       }
     }
     
-    const refundDates = await schedulePayments(amountLoan, refund, startDate);
+    const refundDates = await schedulePayments(amountLoan, refund, currentDate);
 
     for (const date of refundDates) {
       await prisma.refund.create({
@@ -159,6 +189,8 @@ const editLoan = async (req, res) => {
 
 const deleteLoan = async (req, res) => {
     try {
+      await prisma.refund.deleteMany({where: {loanId: parseInt(req.params.id, 10),},
+      });
     const Loan = await prisma.loan.delete({where: {id: parseInt(req.params.id, 10)}});
     res.status(200).json("Loan ayant l'id "+ req.params.id + " à été supprimé");
   } catch (error) {
@@ -166,4 +198,4 @@ const deleteLoan = async (req, res) => {
   }
 }
 
-module.exports = { getAllLoans, getLoanById, newLoan, editLoan, deleteLoan };
+module.exports = { getAllLoans, getLoanByUserId, getLoanById, newLoan, editLoan, deleteLoan };

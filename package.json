@@ -6,6 +6,7 @@
   "scripts": {
     "start": "cd backend && nodemon server.js",
     "dev": "vite",
+    "studio": "cd backend && npx prisma studio",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"

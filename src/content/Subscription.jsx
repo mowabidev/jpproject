@@ -13,18 +13,18 @@ const Subscription = () => {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      nb_part: '',
+      nb_part: null,
     },
     mode: 'onBlur'
   })
 
   const [subscriptions, setSubscriptions] = useState([]);
-  const [subscriptionId, setSubscriptionId] = useState([]);
-  const [userId, setUserId] = useState([]);
+  const [subscriptionId, setSubscriptionId] = useState();
+  const [userId, setUserId] = useState();
   const [settings, setSettings] = useState([]);
-  const [dateString, setDateString] = useState([]);
-  const [nb_part, setNb_part] = useState([]);
-  const [month, setMonth] = useState([]);
+  const [dateString, setDateString] = useState();
+  const [nb_parts, setNb_parts] = useState(); 
+  const [month, setMonth] = useState(); 
   
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -59,6 +59,7 @@ const Subscription = () => {
       .then(data => {
         setSubscriptionId(data.Subscription.id);
         setUserId(data.Subscription.userId);
+        setDateString(data.Subscription.updatedAt);
       })
       .then(() => {
         onOpen();
@@ -82,20 +83,81 @@ const Subscription = () => {
     return totalPoints;
   }
   
-
-  const saveCredit = async (subscriptionId, userId) => {
-    const dateObject = new Date(dateString);
-
-    setMonth(dateObject.getMonth() + 1); 
-    
-
+  const saveCredit = async (subscriptionId, userId, dateString, nb_parts) => {
+    console.log(subscriptionId, userId, dateString, nb_parts)
+    const isoDateString = new Date(dateString).toISOString();
+    const dateObject = new Date(isoDateString);
+    const intMonth = dateObject.getMonth() + 1;
+    const credit = creditCalculate(intMonth, nb_parts);
+  
     try {
       const response = await fetch('http://localhost:5000/credits/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ new: creditCalculate(month, nb_part), userId: userId, createdAt: new Date() }),
+        body: JSON.stringify({
+          new: credit,
+          userId: userId,
+          subscriptionId: subscriptionId
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}`);
+      }else {
+        console.log("Nouveau credit OK !!!")
+      }
+
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement des données :', error);
+    }
+  };
+
+  const updateCredit = async (creditId, dateString, nb_parts) => {
+    try {
+      const isoDateString = new Date(dateString).toISOString();
+      const dateObject = new Date(isoDateString);
+      const intMonth = dateObject.getMonth() + 1;
+  
+      const credit = creditCalculate(intMonth, nb_parts); console.log(intMonth, nb_parts)
+  
+      const response = await fetch(`http://localhost:5000/credits/${creditId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          new: credit,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}`);
+      } else {
+        console.log("Modif OK !!!");
+      }
+    } catch (error) {
+      console.error('Erreur lors de la modification des données :', error);
+    }
+  };
+  
+  const savePayment = async () => {
+    setNb_parts(getValues().nb_part); 
+    const nb = saveNb_parts(getValues().nb_part);
+  
+    const amount = nb * 2000; 
+  
+    try {
+      const response = await fetch(`http://localhost:5000/subscriptions/${subscriptionId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount,
+          updatedAt: new Date(),
+        }),
       });
   
       if (!response.ok) {
@@ -103,50 +165,47 @@ const Subscription = () => {
       }
   
       const data = await response.json();
-      console.log(data);
-      // Faites quelque chose avec la réponse du serveur si nécessaire
-    } catch (error) {
-      console.error('Erreur lors de l\'enregistrement des données :', error);
-    }
-  };
-
-  const savePayement = () => {
-    setDateString(getValues().updatedAt);
-    setNb_part(getValues().nb_part);
-
-    const amount  = nb_part * 2000
-    fetch(`http://localhost:5000/subscriptions/${subscriptionId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        amount,
-        updatedAt: new Date()
-      }),
-    })
-    .then(response => {
-      if(response.ok) {
-        return response.json()
-      }
-      throw new Error("Erreur" + response.status)
-    })
-    .then(data => {
-      setSubscriptions(prevSubscriptions => 
-        prevSubscriptions.map(sub => 
+  
+      setSubscriptions(prevSubscriptions =>
+        prevSubscriptions.map(sub =>
           sub.id === subscriptionId
             ? { ...sub, amount: data.Subscription.amount, updatedAt: data.Subscription.updatedAt }
             : sub
         )
       );
-      saveCredit(subscriptionId, userId);
-    })
-    .catch(error => {
+      
+      (async () => {
+        try {
+          const response = await fetch(`http://localhost:5000/credits/subscriptionId/${subscriptionId}`);
+          if (!response.ok) {
+            console.error(`Erreur lors de la récupération des détails du crédit pour le subscriptionId ${subscriptionId}`);
+            return; // Sortir de la fonction si la requête échoue
+          }
+      
+          const data = await response.json();
+          if (data && data.length > 0) {
+            updateCredit(data[0].id, dateString, nb)
+          } else {
+            // S'il y a des données de crédit, exécutez saveCredit
+            const creditDetails = data[0]; // Utilisez le premier élément si plusieurs crédits sont retournés
+            await saveCredit(subscriptionId, userId, dateString, nb);
+          }
+        } catch (error) {
+          console.error('Erreur lors de la récupération des détails de crédit :', error);
+          // Gérez l'erreur ici si nécessaire
+        }
+      })();
+      
+      reset();
+      onClose();
+    } catch (error) {
       console.error('Erreur lors de l\'enregistrement des données :', error);
-    })
-    reset();
-    onClose();
+    }
   };
+  
+  const saveNb_parts = (nbp) => nbp;
+
+  
 
   return (
     <div>
@@ -197,7 +256,7 @@ const Subscription = () => {
                           </HStack>
                         </Td>
                     </Tr>
-                    )) : <Tr><Td colSpan="5" py="2em"><Center>Aucun membre pour l'instant</Center></Td></Tr>
+                    )) : <Tr><Td colSpan="5" py="2em"><Center>Aucune souscription pour l'instant</Center></Td></Tr>
                     }
                 </Tbody>
             </Table>
@@ -214,7 +273,7 @@ const Subscription = () => {
           <ModalHeader>Nouvelle souscription</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-          <form onSubmit={handleSubmit(savePayement)}>
+          <form onSubmit={handleSubmit(savePayment)}>
             <VStack mb={6}>
               <FormControl isInvalid={errors.nb_part}>
                 <FormLabel>Nombre de part</FormLabel>

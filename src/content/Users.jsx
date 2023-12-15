@@ -59,6 +59,7 @@ const Users = () => {
 
 
   const saveUser = () => {
+    console.log(getValues())
     fetch('http://localhost:5000/users/', {
       method: 'POST',
       headers: {
@@ -201,7 +202,7 @@ const Users = () => {
     .then(async values => {
       const [usersResponse, garantsResponse] = values;
       if(garantsResponse.ok && usersResponse.ok) {
-        const {users} = await values[0].json();
+        const users = await values[0].json();
         const {garants} = await values[1].json();
         setGarant(garants);
         setUsers(users); 

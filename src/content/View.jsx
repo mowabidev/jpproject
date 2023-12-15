@@ -7,9 +7,13 @@ import { useParams } from 'react-router-dom';
 const View = () => {
   const [user, setUser] = useState({});
   const [subById, setSubById] = useState([]); 
+  const [loanById, setLoanById] = useState([]); 
+  const [savingById, setSavingById] = useState([]); 
   const { id } = useParams();
 
-  const totalAmount = subById.reduce((acc, obj) => acc + obj.amount, 0);
+  const totalAmountSub = subById.reduce((acc, obj) => acc + obj.amount, 0);
+  const totalAmountLoan = loanById.reduce((acc, obj) => acc + obj.amount, 0);
+  const totalAmountSaving = savingById.reduce((acc, obj) => acc + obj.amount, 0);
 
   useEffect(() => {
     fetch(`http://localhost:5000/users/${id}`)
@@ -27,6 +31,30 @@ const View = () => {
         return response.json();
       })
       .then(data => setSubById(data))
+      .catch(error => console.error('Erreur lors de la récupération des données :', error));
+  }, [id]);
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/loans/userId/${id}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Réponse réseau incorrecte');
+        }
+        return response.json();
+      })
+      .then(data => setLoanById(data))
+      .catch(error => console.error('Erreur lors de la récupération des données :', error));
+  }, [id]);
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/savings/userId/${id}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Réponse réseau incorrecte');
+        }
+        return response.json();
+      })
+      .then(data => setSavingById(data))
       .catch(error => console.error('Erreur lors de la récupération des données :', error));
   }, [id]);
 
@@ -58,10 +86,10 @@ const View = () => {
             <CardHeader>
               <Heading size="md">SOUSCRIPTIONS</Heading>
             </CardHeader>
-            <CardBody fontSize={"1.5rem"}>{totalAmount} XOF</CardBody>
+            <CardBody fontSize={"1.5rem"}>{totalAmountSub} XOF</CardBody>
             <CardFooter>
               <Button size="xs" colorScheme="teal" variant="solid">
-                <MdRemoveRedEye />
+                Voir plus...
               </Button>
             </CardFooter>
           </Card>
@@ -70,10 +98,10 @@ const View = () => {
             <CardHeader>
               <Heading size="md">EPARGNE</Heading>
             </CardHeader>
-            <CardBody fontSize={"1.5rem"}>500.000 XOF</CardBody>
+            <CardBody fontSize={"1.5rem"}>{totalAmountSaving} XOF</CardBody>
             <CardFooter>
               <Button size="xs" colorScheme="teal" variant="solid">
-                <MdRemoveRedEye />
+                Voir plus...
               </Button>
             </CardFooter>
           </Card>
@@ -82,10 +110,10 @@ const View = () => {
             <CardHeader>
               <Heading size="md">PRÊTS</Heading>
             </CardHeader>
-            <CardBody fontSize={"1.5rem"}>50.000 XOF</CardBody>
+            <CardBody fontSize={"1.5rem"}>{totalAmountLoan} XOF</CardBody>
             <CardFooter>
               <Button size="xs" colorScheme="teal" variant="solid">
-                <MdRemoveRedEye />
+                Voir plus...
               </Button>
             </CardFooter>
           </Card>

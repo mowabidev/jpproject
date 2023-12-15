@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { MdDelete, MdFileDownload, MdMode, MdPersonAdd, MdSearch } from 'react-icons/md'
 
-const Loan = () => {  
+const Saving = () => {  
     const {
     handleSubmit,
     register,
@@ -13,32 +13,38 @@ const Loan = () => {
   } = useForm({
     defaultValues: {
         userId: null,
-        amount: null,
-        refund: null
+        amount: null
     },
     mode: 'onBlur'
   });
   
   const { isOpen, onOpen, onClose } = useDisclosure()
   
-  const [loans, setLoans] = useState([]); 
+  const [savings, setSavings] = useState([]); console.log(savings)
   const [users, setUsers] = useState([]); 
 
 
   useEffect(() => {
+    fetch(`http://localhost:5000/savings`)
+      .then(response => response.json())
+      .then(saving => setSavings(saving)) 
+      .catch(error => console.error('Erreur lors de la récupération des données :', error)); 
+  }, []); // Ajoutez des dépendances si nécessaire
+
+  useEffect(() => {
     Promise.all([
       fetch('http://localhost:5000/users'),
-      fetch('http://localhost:5000/loans')
+      fetch('http://localhost:5000/savings')
     ])
     .then(async values => {
-      const [usersResponse, loansResponse] = values;
-      if(loansResponse.ok && usersResponse.ok) {
+      const [usersResponse, savingsResponse] = values;
+      if(savingsResponse.ok && usersResponse.ok) {
         const users = await values[0].json();
-        const loans = await values[1].json();
-        setLoans(loans);
+        const savings = await values[1].json();
+        setSavings(savings);
         setUsers(users); 
-      } else if(!loansResponse.ok) {
-        throw new Error(`Le serveur des loans a répondu avec une erreur ${loansResponse.status}`)
+      } else if(!savingsResponse.ok) {
+        throw new Error(`Le serveur des savings a répondu avec une erreur ${savingsResponse.status}`)
       } else {
         throw new Error(`Le serveur des utilisateurs a répondu avec une erreur ${usersResponse.status}`)
       }
@@ -46,22 +52,21 @@ const Loan = () => {
     .catch(errors => console.log(errors));
 
   }, []);
-  
 
-  const saveLoan = () => {
+  const saveSaving = () => {
     const userId = parseInt(getValues().userId)
     const amount = parseInt(getValues().amount)
-    const refund = parseInt(getValues().refund)
+
+    console.log(userId, amount)
   
-    fetch('http://localhost:5000/loans/', {
+    fetch('http://localhost:5000/savings/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        userId: userId,
         amount: amount,
-        refund: refund
+        user: userId
       }),
     })
       .then(response => {
@@ -75,7 +80,7 @@ const Loan = () => {
       .then(data => {
         console.log('Données enregistrées avec succès :', data);
   
-        setLoans(prevLoans => [data, ...prevLoans]);
+        setSavings(prevSavings => [data, ...prevSavings]);
       })
       .catch(error => {
         console.error('Erreur lors de l\'enregistrement des données :', error);
@@ -124,7 +129,7 @@ const Loan = () => {
               </Thead>
               <Tbody>
                     { 
-                    loans.length > 0 ? loans.map((item, index) => (
+                    savings.length > 0 ? savings.map((item, index) => (
                     <Tr key={index}>
                         <Td>
                             <Checkbox spacing="1rem" bg="#fff"></Checkbox>
@@ -161,8 +166,8 @@ const Loan = () => {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <VStack mb={6}>
-                <form onSubmit={handleSubmit(saveLoan)}>
-                    <FormControl isInvalid={errors.userId}>
+                <form onSubmit={handleSubmit(saveSaving)}>
+                    <FormControl isInvalid={errors.userId} mb={"30px"}>
                         <FormLabel>Membre</FormLabel>
                         <Select 
                             {...register('userId', {
@@ -181,7 +186,7 @@ const Loan = () => {
                     </FormControl>
 
                     <FormControl isInvalid={errors.amount}>
-                        <FormLabel>Montant</FormLabel>
+                        <FormLabel>Montant de l'épargne</FormLabel>
                         <Input
                             type="number"
                             placeholder="10000"
@@ -192,20 +197,6 @@ const Loan = () => {
                         />
                         <FormErrorMessage>
                           {errors.amount && errors.amount.message}
-                        </FormErrorMessage>
-                    </FormControl>
-
-                    <FormControl isInvalid={errors.refund}>
-                        <FormLabel>Nombre de remboursement</FormLabel>
-                        <Input
-                        type="number"
-                        placeholder="5000"
-                        {...register('refund', {
-                            required: 'Ce champ est obligatoire',
-                        })}
-                        />
-                        <FormErrorMessage>
-                          {errors.refund && errors.refund.message}
                         </FormErrorMessage>
                     </FormControl>
                     <HStack justifyContent="end" mt={"30px"}>
@@ -223,4 +214,4 @@ const Loan = () => {
   )
 }
 
-export default Loan
+export default Saving

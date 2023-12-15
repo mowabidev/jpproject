@@ -9,7 +9,7 @@ const getAllUsers = async (req, res) => {
         id: 'desc', 
       },
     });
-    res.status(200).json({ users });
+    res.status(200).json( users );
   } catch (error) {
     res.status(500).json({ error: 'Une erreur s\'est produite lors de la récupération des utilisateurs.' });
   }
@@ -46,7 +46,6 @@ const getUserByPhone = async (req, res) => {
 const newUser = async (req, res) => {
   try {
     const { garantId, ...userData } = req.body;
-    console.log(garantId, userData);
 
     const user = await prisma.user.create({
       data: { garantId: parseInt(garantId, 10), password: "1234", ...userData }
@@ -72,21 +71,39 @@ const edithUser = async (req, res) => {
 }
 
 const deleteUser = async (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+
   try {
+      await prisma.$transaction(async (tx) => {
+          // Supprimer les références dans d'autres tables en premier
+          await tx.subscription.deleteMany({ where: { userId } });
+          await tx.credit.deleteMany({ where: { userId } });
+          await tx.saving.deleteMany({ where: { userId } });
+          await tx.penalty.deleteMany({ where: { userId } });
 
-      // Supprimer les références dans d'autres tables en premier
-      await prisma.subscription.deleteMany({where: {userId: parseInt(req.params.id, 10),},
+          // Supprimer tous les prêts associés à l'utilisateur
+          const userLoans = await tx.loan.findMany({
+              where: { userId },
+              select: { id: true }, // Sélectionnez uniquement l'ID pour supprimer les remboursements liés
+          });
+
+          for (const loan of userLoans) {
+              await tx.refund.deleteMany({ where: { loanId: loan.id } });
+          }
+
+          await tx.loan.deleteMany({ where: { userId } });
+
+          // Enfin, supprimer l'utilisateur
+          await tx.user.delete({ where: { id: userId } });
       });
 
-      // Ensuite, supprimer l'utilisateur
-      const user = await prisma.user.delete({where: { id: parseInt(req.params.id, 10) },
-      });
-      res.status(200).json("L'utilisateur ayant l'id "+ req.params.id + " à été supprimé");
+      res.status(200).json(`L'utilisateur ayant l'id ${userId} a été supprimé avec succès`);
   } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Erreur lors de la suppression de l\'utilisateur.' });
   }
 };
+
 
 
 

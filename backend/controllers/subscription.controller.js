@@ -14,6 +14,9 @@ const getAllSubscriptions = async (req, res) => {
           },
         },
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
 
     res.status(200).json({ subscriptions });
@@ -25,11 +28,12 @@ const getAllSubscriptions = async (req, res) => {
 const getSubscriptionByUserId = async (req, res) => {
   console.log(req.params.userId);
   try {
-  const subscription = await prisma.subscription.findMany({where: {userId: parseInt(req.params.userId, 10)}});
-  res.status(200).json(subscription);
-} catch (error) {
-  res.status(500).json({error: error.message})
-}
+    const subscription = await prisma.subscription.findMany({where: {userId: parseInt(req.params.userId, 10)}});
+    res.status(200).json(subscription);
+  } 
+  catch (error) {
+    res.status(500).json({error: error.message})
+  }
 }
 
 

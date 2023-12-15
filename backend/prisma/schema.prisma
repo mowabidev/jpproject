@@ -25,6 +25,8 @@ model User {
   garantId     Int
   Penalty      Penalty[]
   Subscription Subscription[]
+  Saving       Saving[]
+  Loan         Loan[]
   Credit       Credit[]
 }
 
@@ -46,27 +48,37 @@ model Subscription {
   total     Int
   hour      DateTime @default(now())
   penalty   Penalty?
-  credit    Credit?   @relation(fields: [creditId], references: [id])
+  credit    Credit[]
   user      User     @relation(fields: [userId], references: [id])
-  scheduledFor DateTime?
   paid         Boolean   @default(false)
   paidAt       DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-  creditId  Int?      @unique
   userId    Int
 }
 
+model Saving {
+  id        Int      @id @default(autoincrement())
+  amount    Int
+  total     Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  userId    Int
+} 
+
 model Credit {
-  id           Int           @id @default(autoincrement())
-  new          String        @db.VarChar(255)
-  total        String        @db.VarChar(255)
-  hour         DateTime      @default(now())
-  subscription Subscription?
-  updatedAt    DateTime      @default(now())
-  User         User          @relation(fields: [userId], references: [id])
-  userId       Int
+  id            Int           @id @default(autoincrement())
+  new           Int
+  total         String        @db.VarChar(255)
+  hour          DateTime      @default(now())
+  subscription  Subscription?  @relation(fields: [subscriptionId], references: [id])
+  subscriptionId Int?
+  updatedAt     DateTime      @default(now())
+  User          User          @relation(fields: [userId], references: [id])
+  userId        Int
 }
+
 
 model Loan {
   id        Int      @id @default(autoincrement())
@@ -74,8 +86,10 @@ model Loan {
   refund    Int
   date      DateTime @default(now())
   sold      Int
+  user      User     @relation(fields: [userId], references: [id])
   updatedAt DateTime @default(now())
   refundDate    Refund[]
+  userId        Int
 }
 
 model Refund {

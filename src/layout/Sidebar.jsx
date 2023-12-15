@@ -18,7 +18,7 @@ const Sidebar = () => {
                     <NavLink label="Tableau de bord" href="/" icon={MdDashboard} active={false} />
                     <NavLink label="Souscriptions" href="/souscriptions" icon={MdAccountBalance} active={false} />
                     <NavLink label="Prêts" href="/prets" icon={MdHandshake} active={false}/>
-                    <NavLink label="Épargne" href="#" icon={MdSavings} />
+                    <NavLink label="Épargne" href="/epargne" icon={MdSavings} />
                     <NavLink label="Membres" href="/membres" icon={MdGroups} />
                     <NavLink label="Paramètres" href="#" icon={MdSettings} />
                     <NavLink label="Déconnexion" href="#" icon={MdLogout} />

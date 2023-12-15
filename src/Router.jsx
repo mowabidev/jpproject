@@ -5,6 +5,7 @@ import Subscription from './content/Subscription'
 import Dashbord from './content/Dashbord'
 import Loan from './content/Loan'
 import View from './content/View'
+import Saving from './content/Saving'
 
 const Router = () => {
   return (
@@ -13,6 +14,7 @@ const Router = () => {
         <Route path="/membres" element={<Users />} />
         <Route path="/souscriptions" element={<Subscription />} />
         <Route path="/prets" element={<Loan />} />
+        <Route path="/epargne" element={<Saving />} />
         <Route path="membres/view/:id" element={<View />} />
     </Routes>
   )
