@@ -11,6 +11,17 @@ const getAllCredits = async (req, res) => {
   }
 }
 
+const getCreditByUserId = async (req, res) => {
+  console.log(req.params.userId);
+  try {
+    const credit = await prisma.credit.findMany({where: {userId: parseInt(req.params.userId, 10)}});
+    res.status(200).json(credit);
+  } 
+  catch (error) {
+    res.status(500).json({error: error.message})
+  }
+}
+
 const getCreditById = async (req, res) => {
     try {
     const Credit = await prisma.credit.findUnique({where: {id: parseInt(req.params.id, 10)}});
@@ -97,4 +108,4 @@ const deleteCredit = async (req, res) => {
   }
 }
 
-module.exports = { getAllCredits, getCreditById, getCreditBySubscriptionId, newCredit, editCredit, deleteCredit };
+module.exports = { getAllCredits, getCreditByUserId, getCreditById, getCreditBySubscriptionId, newCredit, editCredit, deleteCredit };

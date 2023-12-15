@@ -2,6 +2,7 @@ import { Heading, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Avatar, HStac
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { MdMode, MdSearch } from 'react-icons/md'
+import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon } from '@chakra-ui/react'
 
 const Subscription = () => {
   const {
@@ -21,7 +22,7 @@ const Subscription = () => {
   const [subscriptions, setSubscriptions] = useState([]);
   const [subscriptionId, setSubscriptionId] = useState();
   const [userId, setUserId] = useState();
-  const [settings, setSettings] = useState([]);
+  const [users, setusers] = useState([]);
   const [dateString, setDateString] = useState();
   const [nb_parts, setNb_parts] = useState(); 
   const [month, setMonth] = useState(); 
@@ -34,17 +35,17 @@ const Subscription = () => {
   useEffect(() => {
     Promise.all([
       fetch('http://localhost:5000/subscriptions'),
-      fetch('http://localhost:5000/settings')
+      fetch('http://localhost:5000/users')
     ])
     .then(async values => {
-      const [subscriptionsResponse, settingsResponse] = values;
-      if(settingsResponse.ok && subscriptionsResponse.ok) {
+      const [subscriptionsResponse, usersResponse] = values;
+      if(usersResponse.ok && subscriptionsResponse.ok) {
         const {subscriptions} = await values[0].json();
-        const {settings} = await values[1].json();
-        setSettings(settings); 
+        const users = await values[1].json(); console.log(users)
+        setusers(users); 
         setSubscriptions(subscriptions); 
-      } else if(!settingsResponse.ok) {
-        throw new Error(`Le serveur des settings a répondu avec une erreur ${settingsResponse.status}`)
+      } else if(!usersResponse.ok) {
+        throw new Error(`Le serveur des users a répondu avec une erreur ${usersResponse.status}`)
       } else {
         throw new Error(`Le serveur des utilisateurs a répondu avec une erreur ${subscriptionsResponse.status}`)
       }
@@ -149,6 +150,7 @@ const Subscription = () => {
     const amount = nb * 2000; 
   
     try {
+      console.log(subscriptionId)
       const response = await fetch(`http://localhost:5000/subscriptions/${subscriptionId}`, {
         method: 'PATCH',
         headers: {
@@ -209,61 +211,71 @@ const Subscription = () => {
 
   return (
     <div>
-        <Heading as={"h1"} fontSize={"1.5rem"} mb={"2em"}>
-            <HStack justifyContent={"space-between"}>
-                <h1>SOUSCRIPTIONS</h1>
-                <Flex justifyContent={"space-between"} >
-                    <HStack>
-                            <Input placeholder='Rechercher'/>
-                            <Box ml={"-2.5em"}><MdSearch /></Box>
-                    </HStack>
-                </Flex>
-            </HStack>
-        </Heading>
-        <TableContainer>
-            <Divider  borderColor={"#d1d1d1"} m={".5rem 0 1rem"} />
-            <Table size='sm' variant='striped' colorScheme='blackAlpha'>
-                <Thead>
-                <Tr>
-                    <Th><Checkbox spacing='1rem' bg={"#fff"}></Checkbox></Th>
-                    <Th>Identifiant</Th>
-                    <Th>Membre</Th>
-                    <Th>Montant</Th>
-                    <Th>Date</Th>
-                </Tr>
-                </Thead>
-                <Tbody>
-                    { 
-                    subscriptions.length > 0 ? subscriptions.map((item, index) => (
-                    <Tr key={index}>
-                        <Td>
+      <Heading as={"h1"} fontSize={"1.5rem"} mb={"2em"}>
+          <HStack justifyContent={"space-between"}>
+              <h1>SOUSCRIPTIONS</h1>
+              <Flex justifyContent={"space-between"} >
+                  <HStack>
+                          <Input placeholder='Rechercher'/>
+                          <Box ml={"-2.5em"}><MdSearch /></Box>
+                  </HStack>
+              </Flex>
+          </HStack>
+      </Heading>
+      <TableContainer>
+        <Table>
+          <Accordion defaultIndex={[0]} allowMultiple>
+            {users.length > 0 ? users.map((user, userIndex) => (
+              <AccordionItem key={userIndex}>
+                <h2>
+                  <AccordionButton>
+                    <Table>
+                      <Tr>
+                        <Th>{user.id}</Th>
+                        <Th>{user.firstname}</Th>
+                        <Th>{user.lastname}</Th>
+                      </Tr>
+                    </Table>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  {subscriptions.length > 0 ? subscriptions
+                    .filter(subscription => subscription.user.id === user.id) // Filtrer les souscriptions par utilisateur
+                    .map((subscription, subIndex) => (
+                      <Table key={subIndex}>
+                        <Tr>
+                          <Td>
                             <Checkbox spacing="1rem" bg="#fff"></Checkbox>
-                        </Td>
-                        <Td>{item.user.id}</Td>
-                        <Td>
+                          </Td>
+                          <Td>{subscription.user.id}</Td>
+                          <Td>
                             <HStack>
-                                <Avatar name={`${item.user.firstname} ${item.user.lastname}`} size="sm" src="" />{' '}
-                                <span>{item.user.firstname} {item.user.lastname}</span>
+                              <Avatar name={`${subscription.user.firstname} ${subscription.user.lastname}`} size="sm" src="" />{' '}
+                              <span>{subscription.user.firstname} {subscription.user.lastname}</span>
                             </HStack>
-                        </Td>
-                        <Td>{item.amount}</Td>
-                        <Td>{item.updatedAt}</Td>
-                        <Td>
-                          <HStack>
-                              <Button size={"xs"} colorScheme='yellow' variant='solid' onClick={() => fetchSubscriptionDetailsById(item.id)}>
-                                  <MdMode />
+                          </Td>
+                          <Td>{subscription.amount}</Td>
+                          <Td>{subscription.updatedAt}</Td>
+                          <Td>
+                            <HStack>
+                              <Button size={"xs"} colorScheme='yellow' variant='solid' onClick={() => fetchSubscriptionDetailsById(subscription.id)}>
+                                <MdMode />
                               </Button>
-                          </HStack>
-                        </Td>
-                    </Tr>
+                            </HStack>
+                          </Td>
+                        </Tr>
+                      </Table>
                     )) : <Tr><Td colSpan="5" py="2em"><Center>Aucune souscription pour l'instant</Center></Td></Tr>
-                    }
-                </Tbody>
-            </Table>
-        </TableContainer>
+                  }
+                </AccordionPanel>
+              </AccordionItem>
+            )) : <Tr><Td colSpan="5" py="2em"><Center>Aucun user pour l'instant</Center></Td></Tr>}
+          </Accordion>
+        </Table>
+      </TableContainer>
 
-
-        <Modal size={'xs'}
+      <Modal size={'xs'}
         initialFocusRef={initialRef}
         finalFocusRef={finalRef}
         isOpen={isOpen}

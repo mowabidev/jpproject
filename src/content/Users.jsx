@@ -167,18 +167,23 @@ const Users = () => {
   };
   
   const editUser = () => {
+    const requestData = {
+      ...getValues(),
+      garantId: parseInt(getValues().garantId)
+    };
+  
     fetch(`http://localhost:5000/users/${userId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(getValues()),
+      body: JSON.stringify(requestData),
     })
       .then(response => {
         if (response.ok) {
           return response.json();
         }
-        throw new Error("Erreur" + response.status);
+        throw new Error("Erreur " + response.status);
       })
       .then(data => {
         // Mettez à jour l'état avec le nouvel utilisateur
@@ -192,6 +197,7 @@ const Users = () => {
         onCloseRemove();
       });
   };
+  
 
   
   useEffect(() => {

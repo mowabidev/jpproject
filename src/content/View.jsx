@@ -9,11 +9,13 @@ const View = () => {
   const [subById, setSubById] = useState([]); 
   const [loanById, setLoanById] = useState([]); 
   const [savingById, setSavingById] = useState([]); 
+  const [creditById, setCreditById] = useState([]); 
   const { id } = useParams();
 
   const totalAmountSub = subById.reduce((acc, obj) => acc + obj.amount, 0);
   const totalAmountLoan = loanById.reduce((acc, obj) => acc + obj.amount, 0);
   const totalAmountSaving = savingById.reduce((acc, obj) => acc + obj.amount, 0);
+  const totalAmountCredit = creditById.reduce((acc, obj) => acc + obj.amount, 0);
 
   useEffect(() => {
     fetch(`http://localhost:5000/users/${id}`)
@@ -58,6 +60,19 @@ const View = () => {
       .catch(error => console.error('Erreur lors de la récupération des données :', error));
   }, [id]);
 
+  useEffect(() => {
+    fetch(`http://localhost:5000/credits/userId/${id}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Réponse réseau incorrecte');
+        }
+        return response.json();
+      })
+      .then(data => setCreditById(data))
+      .catch(error => console.error('Erreur lors de la récupération des données :', error));
+  }, [id]);
+
+
   return (
     <>
       <Heading as={"h1"} fontSize={"1.5rem"} mb={"2em"}>MEMBRES &gt; {user.firstname + ' ' + user.lastname}</Heading>
@@ -75,7 +90,7 @@ const View = () => {
               <Text fontWeight={'bold'}>Téléphone: <span> {user.phone}  </span> </Text> 
             </VStack>
           </HStack>
-
+          <Button>{totalAmountCredit}</Button>
           <Button colorScheme="blue">Contacter</Button>
         </HStack>
 

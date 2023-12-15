@@ -20,16 +20,8 @@ const Saving = () => {
   
   const { isOpen, onOpen, onClose } = useDisclosure()
   
-  const [savings, setSavings] = useState([]); console.log(savings)
+  const [savings, setSavings] = useState([]); 
   const [users, setUsers] = useState([]); 
-
-
-  useEffect(() => {
-    fetch(`http://localhost:5000/savings`)
-      .then(response => response.json())
-      .then(saving => setSavings(saving)) 
-      .catch(error => console.error('Erreur lors de la récupération des données :', error)); 
-  }, []); // Ajoutez des dépendances si nécessaire
 
   useEffect(() => {
     Promise.all([
@@ -78,8 +70,6 @@ const Saving = () => {
         throw new Error("Erreur" + response.status);
       })
       .then(data => {
-        console.log('Données enregistrées avec succès :', data);
-  
         setSavings(prevSavings => [data, ...prevSavings]);
       })
       .catch(error => {
@@ -129,7 +119,7 @@ const Saving = () => {
               </Thead>
               <Tbody>
                     { 
-                    savings.length > 0 ? savings.map((item, index) => (
+                    savings && savings.length > 0 ? savings.map((item, index) => (
                     <Tr key={index}>
                         <Td>
                             <Checkbox spacing="1rem" bg="#fff"></Checkbox>
