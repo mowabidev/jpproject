@@ -1,18 +1,34 @@
 import React from 'react'
 import './Dashbord.css';
 import { useState, useEffect } from 'react';
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, ChakraProvider } from "@chakra-ui/react";
+import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, ChakraProvider, HStack } from "@chakra-ui/react";
 
 const Dashbord = () => {
-    const [user, setUser] = useState([]);
+    const [users, setusers] = useState([]);
+    const [subscription, setSubscriptions] = useState([]);
     const [userId, setUserId] = useState();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     useEffect(() => {
-      fetch('http://localhost:5000/user')
-        .then(response => response.json())
-        .then(data => setUser(data.users))
-        .catch(error => console.error('Erreur lors de la récupération des données :', error));
+        Promise.all([
+          fetch('http://localhost:5000/subscriptions'),
+          fetch('http://localhost:5000/users')
+        ])
+        .then(async values => {
+          const [subscriptionsResponse, usersResponse] = values;
+          if(usersResponse.ok && subscriptionsResponse.ok) {
+            const {subscriptions} = await values[0].json();
+            const users = await values[1].json(); 
+            setusers(users); 
+            setSubscriptions(subscriptions); 
+          } else if(!usersResponse.ok) {
+            throw new Error(`Le serveur des users a répondu avec une erreur ${usersResponse.status}`)
+          } else {
+            throw new Error(`Le serveur des utilisateurs a répondu avec une erreur ${subscriptionsResponse.status}`)
+          }
+        })
+        .catch(errors => console.log(errors));
+    
     }, []);
     
   return (
@@ -24,35 +40,65 @@ const Dashbord = () => {
             </div>
         </div>
 
-        <div className="table-data">
-            <div className="order">
-            <div className="head">
-                <h3>Liste des membres</h3>
-                <i className='bx bx-search' ></i>
-                <i className='bx bx-filter' ></i>
+        <HStack>
+            <div className="table-data">
             </div>
-            <table>
-                <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Prénom</th>
-                    <th>Voir plus</th>
-                </tr>
-                </thead>
-                <tbody>
-                    {user.map((item, index) => (
-                        <tr key={index}>
-                            <td>{item.firstname}</td>
-                            <td>{item.lastname}</td>
-                            <td>
-                                <span className="status completed" onClick={onOpen}>Recap</span>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <div className="table-data">
             </div>
-        </div>
+        </HStack>
+
+        <HStack>
+            <div className="table-data">
+                <div className="order">
+                <div className="head">
+                    <h3>Liste des membres</h3>
+                    <i className='bx bx-search' ></i>
+                    <i className='bx bx-filter' ></i>
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {users.map((item, index) => (
+                            <tr key={index}>
+                                <td>{item.firstname}</td>
+                                <td>{item.lastname}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            <div className="table-data">
+                <div className="order">
+                <div className="head">
+                    <h3>Liste des membres</h3>
+                    <i className='bx bx-search' ></i>
+                    <i className='bx bx-filter' ></i>
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {users.map((item, index) => (
+                            <tr key={index}>
+                                <td>{item.firstname}</td>
+                                <td>{item.lastname}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </HStack>
         
         <Modal isCentered onClose={onClose} isOpen={isOpen} motionPreset='slideInBottom'>
             <ModalOverlay />

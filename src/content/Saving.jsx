@@ -152,7 +152,7 @@ const Saving = () => {
         onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Nouveau prêt</ModalHeader>
+          <ModalHeader>Nouvelle épargne</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
             <VStack mb={6}>

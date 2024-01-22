@@ -24,7 +24,19 @@ const getAllSavings = async (req, res) => {
 const getSavingByUserId = async (req, res) => {
   console.log(req.params.userId);
   try {
-    const Saving = await prisma.saving.findMany({where: {userId: parseInt(req.params.userId, 10)}});
+    const Saving = await prisma.saving.findMany(
+      {
+        where: {userId: parseInt(req.params.userId, 10)},
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstname: true,
+              lastname: true,
+            },
+          },
+        }
+      });
     res.status(200).json(Saving);
   } 
   catch (error) {

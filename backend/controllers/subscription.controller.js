@@ -13,9 +13,6 @@ const getAllSubscriptions = async (req, res) => {
             lastname: true,
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc'
       }
     });
 
@@ -28,7 +25,19 @@ const getAllSubscriptions = async (req, res) => {
 const getSubscriptionByUserId = async (req, res) => {
   console.log(req.params.userId);
   try {
-    const subscription = await prisma.subscription.findMany({where: {userId: parseInt(req.params.userId, 10)}});
+    const subscription = await prisma.subscription.findMany(
+      {
+        where: {userId: parseInt(req.params.userId, 10)},
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstname: true,
+              lastname: true,
+            },
+          },
+        }
+      });
     res.status(200).json(subscription);
   } 
   catch (error) {

@@ -15,6 +15,7 @@ const Subscription = () => {
   } = useForm({
     defaultValues: {
       nb_part: null,
+      checkboxField: false
     },
     mode: 'onBlur'
   })
@@ -41,7 +42,7 @@ const Subscription = () => {
       const [subscriptionsResponse, usersResponse] = values;
       if(usersResponse.ok && subscriptionsResponse.ok) {
         const {subscriptions} = await values[0].json();
-        const users = await values[1].json(); console.log(users)
+        const users = await values[1].json(); 
         setusers(users); 
         setSubscriptions(subscriptions); 
       } else if(!usersResponse.ok) {
@@ -89,7 +90,8 @@ const Subscription = () => {
     const isoDateString = new Date(dateString).toISOString();
     const dateObject = new Date(isoDateString);
     const intMonth = dateObject.getMonth() + 1;
-    const credit = creditCalculate(intMonth, nb_parts);
+    const intHour = dateObject.getHours(); console.log(dateObject, intHour)
+    const credit = creditCalculate(intMonth, nb_parts); console.log(intMonth,credit)
   
     try {
       const response = await fetch('http://localhost:5000/credits/', {
@@ -121,7 +123,7 @@ const Subscription = () => {
       const dateObject = new Date(isoDateString);
       const intMonth = dateObject.getMonth() + 1;
   
-      const credit = creditCalculate(intMonth, nb_parts); console.log(intMonth, nb_parts)
+      const credit = creditCalculate(intMonth, nb_parts);  console.log(intMonth, nb_parts)
   
       const response = await fetch(`http://localhost:5000/credits/${creditId}`, {
         method: 'PATCH',
@@ -146,11 +148,11 @@ const Subscription = () => {
   const savePayment = async () => {
     setNb_parts(getValues().nb_part); 
     const nb = saveNb_parts(getValues().nb_part);
+    const penality = getValues().checkboxField;
   
     const amount = nb * 2000; 
   
     try {
-      console.log(subscriptionId)
       const response = await fetch(`http://localhost:5000/subscriptions/${subscriptionId}`, {
         method: 'PATCH',
         headers: {
@@ -164,6 +166,24 @@ const Subscription = () => {
   
       if (!response.ok) {
         throw new Error(`Erreur ${response.status}`);
+      }else {
+        if(penality == true) {
+          try {
+            const response = await fetch(`http://localhost:5000/penalities`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userId: userId,
+                subscriptionId: subscriptionId,
+                amount: 500
+              }),
+            });
+          }  catch (error) {
+            console.error('Erreur lors de l\'enregistrement de la pénalité :', error);
+          }
+        }
       }
   
       const data = await response.json();
@@ -229,11 +249,10 @@ const Subscription = () => {
               <AccordionItem key={userIndex}>
                 <h2>
                   <AccordionButton>
-                    <Table>
+                    <Table bg="#dbdbdb">
                       <Tr>
-                        <Th>{user.id}</Th>
-                        <Th>{user.firstname}</Th>
-                        <Th>{user.lastname}</Th>
+                        <Th>{user.firstname} {user.lastname}</Th>
+                        <Th></Th>
                       </Tr>
                     </Table>
                     <AccordionIcon />
@@ -285,7 +304,7 @@ const Subscription = () => {
           <ModalHeader>Nouvelle souscription</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-          <form onSubmit={handleSubmit(savePayment)}>
+          <form onSubmit={handleSubmit(savePayment)}  >
             <VStack mb={6}>
               <FormControl isInvalid={errors.nb_part}>
                 <FormLabel>Nombre de part</FormLabel>
@@ -302,12 +321,9 @@ const Subscription = () => {
               </FormControl>
               <FormControl isInvalid={errors.checkboxField}>
                 <Checkbox
-                  defaultChecked
-                  {...register('checkboxField', {
-                    required: 'Ce champ est obligatoire',
-                  })}
+                  {...register('checkboxField')}
                 >
-                  Payé
+                  Pénalité
                 </Checkbox>
                 {errors.checkboxField && (
                   <FormErrorMessage>{errors.checkboxField.message}</FormErrorMessage>
@@ -324,7 +340,7 @@ const Subscription = () => {
 
           </ModalBody>
         </ModalContent>
-        </Modal>
+      </Modal>
     </div>
   )
 }

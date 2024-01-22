@@ -24,7 +24,18 @@ const getAllLoans = async (req, res) => {
 const getLoanByUserId = async (req, res) => {
   console.log(req.params.userId);
   try {
-    const loan = await prisma.loan.findMany({where: {userId: parseInt(req.params.userId, 10)}});
+    const loan = await prisma.loan.findMany({
+      where: {userId: parseInt(req.params.userId, 10)},
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstname: true,
+            lastname: true,
+          },
+        }
+      }
+    });
     res.status(200).json(loan);
   } 
   catch (error) {

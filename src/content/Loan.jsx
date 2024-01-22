@@ -129,7 +129,7 @@ const Loan = () => {
                         <Td>
                             <Checkbox spacing="1rem" bg="#fff"></Checkbox>
                         </Td>
-                        <Td>{item.user.id}</Td>
+                        <Td>{item.userId}</Td>
                         <Td>
                             <HStack>
                                 <Avatar name={`${item.user.firstname} ${item.user.lastname}`} size="sm" src="" />{' '}
@@ -181,7 +181,7 @@ const Loan = () => {
                     </FormControl>
 
                     <FormControl isInvalid={errors.amount}>
-                        <FormLabel>Montant</FormLabel>
+                        <FormLabel>Montant du prêt</FormLabel>
                         <Input
                             type="number"
                             placeholder="10000"
@@ -196,7 +196,7 @@ const Loan = () => {
                     </FormControl>
 
                     <FormControl isInvalid={errors.refund}>
-                        <FormLabel>Nombre de remboursement</FormLabel>
+                        <FormLabel>Montant de remboursement</FormLabel>
                         <Input
                         type="number"
                         placeholder="5000"

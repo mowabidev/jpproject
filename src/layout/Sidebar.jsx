@@ -11,23 +11,18 @@ const Sidebar = () => {
         <div>
             <VStack bg={"#f4f4f4"} minHeight={"100vh"} w={"220px"} justifyContent={"space-between"} alignItems={"stretch"} flexShrink={0} display={{base: "none", lg: "block"}}>
                 <Box>
-                <Box textAlign={"center"} fontSize={"1.2rem"} textTransform={"uppercase"} fontWeight={"bold"} height={"4rem"} lineHeight={"4rem"}>
-                    Micro-tontine
+                    <Box textAlign={"center"} fontSize={"1.2rem"} textTransform={"uppercase"} fontWeight={"bold"} height={"4rem"} lineHeight={"4rem"}>
+                        Micro-tontine
+                    </Box>
+                    <List>
+                        <NavLink label="Tableau de bord" href="/" icon={MdDashboard} active={false} />
+                        <NavLink label="Souscriptions" href="/souscriptions" icon={MdAccountBalance} active={false} />
+                        <NavLink label="Prêts" href="/prets" icon={MdHandshake} active={false}/>
+                        <NavLink label="Épargne" href="/epargne" icon={MdSavings} />
+                        <NavLink label="Membres" href="/membres" icon={MdGroups} />
+                        <NavLink label="Paramètres" href="#" icon={MdSettings} />
+                    </List>
                 </Box>
-                <List>
-                    <NavLink label="Tableau de bord" href="/" icon={MdDashboard} active={false} />
-                    <NavLink label="Souscriptions" href="/souscriptions" icon={MdAccountBalance} active={false} />
-                    <NavLink label="Prêts" href="/prets" icon={MdHandshake} active={false}/>
-                    <NavLink label="Épargne" href="/epargne" icon={MdSavings} />
-                    <NavLink label="Membres" href="/membres" icon={MdGroups} />
-                    <NavLink label="Paramètres" href="#" icon={MdSettings} />
-                    <NavLink label="Déconnexion" href="#" icon={MdLogout} />
-                </List>
-                </Box>
-                <HStack padding={".5em 1em"} justifyContent={"space-between"} borderTop={"1px solid #d1d1d1"}>
-                <Box>Member Name</Box>
-                <MdMoreHoriz />
-                </HStack>
             </VStack>
             <Box display={{ base: 'block', lg: 'none' }}>
                 <MdDehaze onClick={onOpen} />
